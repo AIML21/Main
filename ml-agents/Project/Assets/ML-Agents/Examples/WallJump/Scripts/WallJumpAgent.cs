@@ -83,7 +83,7 @@ public class WallJumpAgent : Agent
     // Begin the jump sequence
     public void Jump()
     {
-        jumpingTime = 0.2f;
+        jumpingTime = 0.5f;
         m_JumpStartingPos = m_AgentRb.position;
     }
 
@@ -225,7 +225,7 @@ public class WallJumpAgent : Agent
                 Jump();
             }
 
-        transform.Rotate(rotateDir, Time.fixedDeltaTime * 300f);
+        transform.Rotate(rotateDir, Time.fixedDeltaTime * 200f);
         m_AgentRb.AddForce(dirToGo * m_WallJumpSettings.agentRunSpeed,
             ForceMode.VelocityChange);
 
