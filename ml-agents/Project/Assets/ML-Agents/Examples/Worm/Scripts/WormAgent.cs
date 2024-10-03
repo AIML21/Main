@@ -17,6 +17,8 @@ public class WormAgent : Agent
     public Transform bodySegment2;
     public Transform bodySegment3;
 
+    [Header("Effects")] public ParticleSystem rewardParticles;
+
     //This will be used as a stabilized model space reference point for observations
     //Because ragdolls can move erratically during training, using a stabilized reference transform improves learning
     OrientationCubeController m_OrientationCube;
@@ -43,6 +45,14 @@ public class WormAgent : Agent
         m_JdController.SetupBodyPart(bodySegment1);
         m_JdController.SetupBodyPart(bodySegment2);
         m_JdController.SetupBodyPart(bodySegment3);
+
+        if (rewardParticles != null)
+        {
+            rewardParticles.Play();
+        } else {
+            Debug.Log("No particles assigned!");
+
+        }
     }
 
 
@@ -54,6 +64,7 @@ public class WormAgent : Agent
     void SpawnTarget(Transform prefab, Vector3 pos)
     {
         m_Target = Instantiate(prefab, pos, Quaternion.identity, transform.parent);
+        rewardParticles.Play();
     }
 
     /// <summary>
@@ -129,9 +140,12 @@ public class WormAgent : Agent
     /// Agent touched the target
     /// </summary>
     public void TouchedTarget()
-    {
-        AddReward(1f);
-    }
+{
+
+    AddReward(1f);
+    rewardParticles.Play();  // Play the particle system
+}
+
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
