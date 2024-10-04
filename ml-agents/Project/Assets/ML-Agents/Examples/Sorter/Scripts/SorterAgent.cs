@@ -218,7 +218,7 @@ public class SorterAgent : Agent
         }
 
         transform.Rotate(rotateDir, Time.deltaTime * 200f);
-        m_AgentRb.AddForce(dirToGo * 2, ForceMode.VelocityChange);
+        m_AgentRb.AddForce(dirToGo * 4, ForceMode.VelocityChange);
 
     }
 
