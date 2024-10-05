@@ -219,6 +219,11 @@ public class CrawlerAgent : Agent
                 : unGroundedMaterial;
         }
 
+        float distanceToTarget = Vector3.Distance(body.position, m_Target.position);
+        Color newColor = Color.Lerp(Color.red, Color.green, 1 - (distanceToTarget / 15.0f));
+        body.GetComponent<MeshRenderer>().material.color = newColor;
+
+
         var cubeForward = m_OrientationCube.transform.forward;
 
         // Set reward for this step according to mixture of the following elements.
