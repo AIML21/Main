@@ -34,8 +34,15 @@ public class Ball3DAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        var actionZ = 2f * Mathf.Clamp(actionBuffers.ContinuousActions[0], -1f, 1f);
-        var actionX = 2f * Mathf.Clamp(actionBuffers.ContinuousActions[1], -1f, 1f);
+        // Calculate distance of the ball from the agent to adjust sensitivity
+        float distance = Vector3.Distance(ball.transform.position, gameObject.transform.position);
+        float ballSpeed = m_BallRb.velocity.magnitude;
+
+        // Non-linear function to increase sensitivity at extremes and adjust based on ball speed
+        float sensitivityMultiplier = Mathf.Clamp01(Mathf.Pow(distance / 2, 2) * Mathf.Pow(ballSpeed, 3));
+
+        var actionZ = 2f * Mathf.Clamp(actionBuffers.ContinuousActions[0], -1f, 1f) * sensitivityMultiplier;
+        var actionX = 2f * Mathf.Clamp(actionBuffers.ContinuousActions[1], -1f, 1f) * sensitivityMultiplier;
 
         if ((gameObject.transform.rotation.z < 0.25f && actionZ > 0f) ||
             (gameObject.transform.rotation.z > -0.25f && actionZ < 0f))
