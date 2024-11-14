@@ -6,7 +6,7 @@ using Unity.MLAgents.Policies;
 public enum Team
 {
     Blue = 0,
-    Red = 1
+    Purple = 1
 }
 
 public class AgentSoccer : Agent
@@ -69,7 +69,7 @@ public class AgentSoccer : Agent
         }
         else
         {
-            team = Team.Red;
+            team = Team.Purple;
             initialPos = new Vector3(transform.position.x + 5f, .5f, transform.position.z);
             rotSign = -1f;
         }
