@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using Unity.MLAgents.Sensors;
 
 public enum Team
 {
@@ -11,7 +12,7 @@ public enum Team
 
 public class AgentSoccer : Agent
 {
-    // Note that that the detectable tags are different for the blue and Red teams. The order is
+    // Note that that the detectable tags are different for the blue and purple teams. The order is
     // * ball
     // * own goal
     // * opposing goal
@@ -37,7 +38,7 @@ public class AgentSoccer : Agent
     float m_Existential;
     float m_LateralSpeed;
     float m_ForwardSpeed;
-
+    public float hearingRadius = 10f;
 
     [HideInInspector]
     public Rigidbody agentRb;
@@ -214,4 +215,39 @@ public class AgentSoccer : Agent
         m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, hearingRadius);
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, hearingRadius);
+        int detectedObjectsCount = 0;
+        int maxDetectedObjects = 4;
+        foreach (var obj in nearbyObjects)
+        {
+            if (obj.gameObject == gameObject) continue; 
+
+            Rigidbody rb = obj.GetComponent<Rigidbody>();
+            if (rb != null && rb.velocity.magnitude > 0.1f) 
+            {
+                if (detectedObjectsCount >= maxDetectedObjects) break;
+
+                Vector3 relativePosition = obj.transform.position - transform.position;
+                sensor.AddObservation(relativePosition.normalized); 
+                sensor.AddObservation(relativePosition.magnitude / hearingRadius); 
+                sensor.AddObservation(rb.velocity.magnitude / hearingRadius); 
+                detectedObjectsCount++;
+            }
+        }
+        while (detectedObjectsCount < maxDetectedObjects)
+        {
+            sensor.AddObservation(Vector3.zero); 
+            sensor.AddObservation(0f); 
+            sensor.AddObservation(0f); 
+            detectedObjectsCount++;
+        }
+    }
 }

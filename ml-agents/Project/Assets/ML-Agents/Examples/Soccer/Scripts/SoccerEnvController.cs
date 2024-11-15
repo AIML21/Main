@@ -135,4 +135,16 @@ public class SoccerEnvController : MonoBehaviour
         //Reset Ball
         ResetBall();
     }
+
+    public List<GameObject> EmitSoundSources()
+    {
+        List<GameObject> soundSources = new List<GameObject>();
+        soundSources.Add(ball); 
+        foreach (var agent in AgentsList)
+        {
+            soundSources.Add(agent.Agent.gameObject); 
+        }
+        return soundSources;
+    }
+
 }
