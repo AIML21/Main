@@ -138,10 +138,10 @@ public void MoveAgent(ActionSegment<int> act)
         switch (visionAxis)
         {
             case 1:
-                visionAngle -= 180f; // Look left
+                visionAngle -= 360f; // Look left
                 break;
             case 2:
-                visionAngle += 180f; // Look right
+                visionAngle += 360f; // Look right
                 break;
         }
     }
