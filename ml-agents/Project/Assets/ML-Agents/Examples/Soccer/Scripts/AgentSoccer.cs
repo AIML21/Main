@@ -138,10 +138,10 @@ public void MoveAgent(ActionSegment<int> act)
         switch (visionAxis)
         {
             case 1:
-                visionAngle -= 180f; // Look left
+                visionAngle -= 360f; // Look left
                 break;
             case 2:
-                visionAngle += 180f; // Look right
+                visionAngle += 360f; // Look right
                 break;
         }
     }
@@ -149,7 +149,7 @@ public void MoveAgent(ActionSegment<int> act)
     // Clamp vision angle to 360 degrees
     visionAngle = Mathf.Repeat(visionAngle, 360f);
 
-    transform.Rotate(rotateDir, Time.deltaTime * 100f);
+    transform.Rotate(rotateDir, Time.deltaTime * 150f);
     agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
         ForceMode.VelocityChange);
 }

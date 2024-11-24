@@ -40,7 +40,7 @@ namespace Unity.MLAgents.Sensors
         [HideInInspector, SerializeField, FormerlySerializedAs("raysPerDirection")]
         [Range(0, 50)]
         [Tooltip("Number of rays to the left and right of center.")]
-        int m_RaysPerDirection = 3;
+        int m_RaysPerDirection = 6;
 
         /// <summary>
         /// Number of rays to the left and right of center.
@@ -57,7 +57,7 @@ namespace Unity.MLAgents.Sensors
         [Range(0, 180)]
         [Tooltip("Cone size for rays. Using 90 degrees will cast rays to the left and right. " +
             "Greater than 90 degrees will go backwards.")]
-        float m_MaxRayDegrees = 70;
+        float m_MaxRayDegrees = 90;
 
         /// <summary>
         /// Cone size for rays. Using 90 degrees will cast rays to the left and right.
@@ -86,7 +86,7 @@ namespace Unity.MLAgents.Sensors
         [HideInInspector, SerializeField, FormerlySerializedAs("rayLength")]
         [Range(1, 1000)]
         [Tooltip("Length of the rays to cast.")]
-        float m_RayLength = 20f;
+        float m_RayLength = 25f;
 
         /// <summary>
         /// Length of the rays to cast.
