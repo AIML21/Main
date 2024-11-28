@@ -24,6 +24,11 @@ public class AgentSoccer : Agent
     float m_BallTouch;
     public Position position;
 
+    public float jumpForce = 10f; // Adjust as needed for a realistic jump
+    public float jumpInterval = 2f; // Interval in seconds
+    private float lastJumpTime; // Tracks the last jump time
+
+
     const float k_Power = 2000f;
     float m_Existential;
     float m_LateralSpeed;
@@ -89,6 +94,21 @@ public class AgentSoccer : Agent
         visionAngle = 0f; // Initialize vision angle
     }
 
+private bool IsGrounded()
+{
+    return Physics.Raycast(transform.position, Vector3.down, 1.1f);
+}
+
+void JumpIfNeeded()
+{
+    if (Time.time - lastJumpTime >= jumpInterval && IsGrounded())
+    {
+        agentRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        lastJumpTime = Time.time; // Update the last jump time
+    }
+}
+
+
 public void MoveAgent(ActionSegment<int> act)
 {
     var dirToGo = Vector3.zero;
@@ -99,7 +119,7 @@ public void MoveAgent(ActionSegment<int> act)
     var forwardAxis = act[0];
     var rightAxis = act[1];
     var rotateAxis = act[2];
-    var visionAxis = act.Length > 3 ? act[3] : 0; // Safeguard against index out of range
+    var visionAxis = act.Length > 3 ? act[3] : 0;
 
     switch (forwardAxis)
     {
@@ -132,27 +152,40 @@ public void MoveAgent(ActionSegment<int> act)
             break;
     }
 
-    // Adjust vision angle only if available
     if (act.Length > 3)
     {
         switch (visionAxis)
         {
             case 1:
+<<<<<<< Updated upstream
                 visionAngle -= 180f; // Look left
                 break;
             case 2:
                 visionAngle += 180f; // Look right
+=======
+                visionAngle -= 360f;
+                break;
+            case 2:
+                visionAngle += 360f;
+>>>>>>> Stashed changes
                 break;
         }
     }
 
-    // Clamp vision angle to 360 degrees
     visionAngle = Mathf.Repeat(visionAngle, 360f);
 
+<<<<<<< Updated upstream
     transform.Rotate(rotateDir, Time.deltaTime * 100f);
     agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
         ForceMode.VelocityChange);
+=======
+    transform.Rotate(rotateDir, Time.deltaTime * 150f);
+    agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
+
+    JumpIfNeeded(); // Call the jump logic here
+>>>>>>> Stashed changes
 }
+
 
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
