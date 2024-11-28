@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44971454, g: 0.49977928, b: 0.5756385, a: 1}
+  m_IndirectSpecularColor: {r: 0.44971502, g: 0.49977982, b: 0.57563883, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -290,6 +290,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 224796324260922368, guid: 3ce107b4a79bc4eef83afde434932a68,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -403,6 +408,26 @@ PrefabInstance:
     - target: {fileID: 4558743310993102, guid: 54f3340298537426e96a6cc530e2d5d8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2191321454971006201, guid: 54f3340298537426e96a6cc530e2d5d8,
+        type: 3}
+      propertyPath: jumpForce
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3346330378613647955, guid: 54f3340298537426e96a6cc530e2d5d8,
+        type: 3}
+      propertyPath: jumpForce
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5761122559568588568, guid: 54f3340298537426e96a6cc530e2d5d8,
+        type: 3}
+      propertyPath: jumpForce
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8116522033120601442, guid: 54f3340298537426e96a6cc530e2d5d8,
+        type: 3}
+      propertyPath: jumpForce
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -763,6 +788,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4c32d32dfa994d14a009cc1f393c634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visionAdjustmentSpeed: 10
   purpleMaterial: {fileID: 2100000, guid: b0da1813c36914e678ba57f2790424e1, type: 2}
   blueMaterial: {fileID: 2100000, guid: c9fa44c2c3f8ce74ca39a3355ea42631, type: 2}
   randomizePlayersTeamForTraining: 0
