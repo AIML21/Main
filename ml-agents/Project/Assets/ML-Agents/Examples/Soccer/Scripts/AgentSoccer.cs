@@ -12,14 +12,6 @@ public enum Team
 
 public class AgentSoccer : Agent
 {
-    // Note that that the detectable tags are different for the blue and purple teams. The order is
-    // * ball
-    // * own goal
-    // * opposing goal
-    // * wall
-    // * own teammate
-    // * opposing player
-
     public enum Position
     {
         Striker,
@@ -30,7 +22,6 @@ public class AgentSoccer : Agent
     [HideInInspector]
     public Team team;
     float m_KickPower;
-    // The coefficient for the reward for colliding with a ball. Set using curriculum.
     float m_BallTouch;
     public Position position;
 
@@ -38,7 +29,9 @@ public class AgentSoccer : Agent
     float m_Existential;
     float m_LateralSpeed;
     float m_ForwardSpeed;
-    public float hearingRadius = 10f;
+
+    public float hearingRadius = 10f; // Radius within which sounds are detected
+    const float jumpForce = 5000f; // Force applied for jumping
 
     [HideInInspector]
     public Rigidbody agentRb;
@@ -139,22 +132,17 @@ public class AgentSoccer : Agent
         }
 
         transform.Rotate(rotateDir, Time.deltaTime * 100f);
-        agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
-            ForceMode.VelocityChange);
+        agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
-
     {
-
         if (position == Position.Goalie)
         {
-            // Existential bonus for Goalies.
             AddReward(m_Existential);
         }
         else if (position == Position.Striker)
         {
-            // Existential penalty for Strikers
             AddReward(-m_Existential);
         }
         MoveAgent(actionBuffers.DiscreteActions);
@@ -163,37 +151,14 @@ public class AgentSoccer : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
-        //forward
-        if (Input.GetKey(KeyCode.W))
-        {
-            discreteActionsOut[0] = 1;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            discreteActionsOut[0] = 2;
-        }
-        //rotate
-        if (Input.GetKey(KeyCode.A))
-        {
-            discreteActionsOut[2] = 1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            discreteActionsOut[2] = 2;
-        }
-        //right
-        if (Input.GetKey(KeyCode.E))
-        {
-            discreteActionsOut[1] = 1;
-        }
-        if (Input.GetKey(KeyCode.Q))
-        {
-            discreteActionsOut[1] = 2;
-        }
+        if (Input.GetKey(KeyCode.W)) discreteActionsOut[0] = 1;
+        if (Input.GetKey(KeyCode.S)) discreteActionsOut[0] = 2;
+        if (Input.GetKey(KeyCode.A)) discreteActionsOut[2] = 1;
+        if (Input.GetKey(KeyCode.D)) discreteActionsOut[2] = 2;
+        if (Input.GetKey(KeyCode.E)) discreteActionsOut[1] = 1;
+        if (Input.GetKey(KeyCode.Q)) discreteActionsOut[1] = 2;
     }
-    /// <summary>
-    /// Used to provide a "kick" to the ball.
-    /// </summary>
+
     void OnCollisionEnter(Collision c)
     {
         var force = k_Power * m_KickPower;
@@ -226,28 +191,47 @@ public class AgentSoccer : Agent
         Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, hearingRadius);
         int detectedObjectsCount = 0;
         int maxDetectedObjects = 4;
+        bool soundDetected = false;
+
         foreach (var obj in nearbyObjects)
         {
-            if (obj.gameObject == gameObject) continue; 
+            if (obj.gameObject == gameObject) continue;
 
             Rigidbody rb = obj.GetComponent<Rigidbody>();
-            if (rb != null && rb.velocity.magnitude > 0.1f) 
+            if (rb != null && rb.velocity.magnitude > 0.1f)
             {
                 if (detectedObjectsCount >= maxDetectedObjects) break;
 
                 Vector3 relativePosition = obj.transform.position - transform.position;
-                sensor.AddObservation(relativePosition.normalized); 
-                sensor.AddObservation(relativePosition.magnitude / hearingRadius); 
-                sensor.AddObservation(rb.velocity.magnitude / hearingRadius); 
+                sensor.AddObservation(relativePosition.normalized);
+                sensor.AddObservation(relativePosition.magnitude / hearingRadius);
+                sensor.AddObservation(rb.velocity.magnitude / hearingRadius);
+
                 detectedObjectsCount++;
+                soundDetected = true;
             }
         }
+
         while (detectedObjectsCount < maxDetectedObjects)
         {
-            sensor.AddObservation(Vector3.zero); 
-            sensor.AddObservation(0f); 
-            sensor.AddObservation(0f); 
+            sensor.AddObservation(Vector3.zero);
+            sensor.AddObservation(0f);
+            sensor.AddObservation(0f);
             detectedObjectsCount++;
+        }
+
+        if (soundDetected)
+        {
+            Jump();
+        }
+    }
+
+    void Jump()
+    {
+        if (Mathf.Abs(agentRb.velocity.y) < 0.01f) // Check if grounded
+        {
+            agentRb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+            Debug.Log("Agent jumped due to sound detection!");
         }
     }
 }
