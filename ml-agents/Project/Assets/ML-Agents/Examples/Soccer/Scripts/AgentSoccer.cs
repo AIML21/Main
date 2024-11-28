@@ -24,11 +24,6 @@ public class AgentSoccer : Agent
     float m_BallTouch;
     public Position position;
 
-    public float jumpForce = 10f; // Adjust as needed for a realistic jump
-    public float jumpInterval = 2f; // Interval in seconds
-    private float lastJumpTime; // Tracks the last jump time
-
-
     const float k_Power = 2000f;
     float m_Existential;
     float m_LateralSpeed;
@@ -44,6 +39,11 @@ public class AgentSoccer : Agent
     EnvironmentParameters m_ResetParams;
 
     public float visionAngle; // Added vision angle
+
+    // Variables for jumping
+    public float jumpForce = 10f; // Force applied for the jump
+    public float jumpInterval = 2f; // Time in seconds between jumps
+    private float lastJumpTime; // Tracks the last jump time
 
     public override void Initialize()
     {
@@ -94,99 +94,92 @@ public class AgentSoccer : Agent
         visionAngle = 0f; // Initialize vision angle
     }
 
-private bool IsGrounded()
-{
-    return Physics.Raycast(transform.position, Vector3.down, 1.1f);
-}
-
-void JumpIfNeeded()
-{
-    if (Time.time - lastJumpTime >= jumpInterval && IsGrounded())
+    void Update()
     {
-        agentRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        lastJumpTime = Time.time; // Update the last jump time
-    }
-}
-
-
-public void MoveAgent(ActionSegment<int> act)
-{
-    var dirToGo = Vector3.zero;
-    var rotateDir = Vector3.zero;
-
-    m_KickPower = 0f;
-
-    var forwardAxis = act[0];
-    var rightAxis = act[1];
-    var rotateAxis = act[2];
-    var visionAxis = act.Length > 3 ? act[3] : 0;
-
-    switch (forwardAxis)
-    {
-        case 1:
-            dirToGo = transform.forward * m_ForwardSpeed;
-            m_KickPower = 1f;
-            break;
-        case 2:
-            dirToGo = transform.forward * -m_ForwardSpeed;
-            break;
-    }
-
-    switch (rightAxis)
-    {
-        case 1:
-            dirToGo = transform.right * m_LateralSpeed;
-            break;
-        case 2:
-            dirToGo = transform.right * -m_LateralSpeed;
-            break;
-    }
-
-    switch (rotateAxis)
-    {
-        case 1:
-            rotateDir = transform.up * -1f;
-            break;
-        case 2:
-            rotateDir = transform.up * 1f;
-            break;
-    }
-
-    if (act.Length > 3)
-    {
-        switch (visionAxis)
+        // Check if enough time has passed since the last jump and the agent is grounded
+        if (Time.time - lastJumpTime >= jumpInterval && IsGrounded())
         {
-            case 1:
-<<<<<<< Updated upstream
-                visionAngle -= 180f; // Look left
-                break;
-            case 2:
-                visionAngle += 180f; // Look right
-=======
-                visionAngle -= 360f;
-                break;
-            case 2:
-                visionAngle += 360f;
->>>>>>> Stashed changes
-                break;
+            Jump();
+            lastJumpTime = Time.time; // Update the last jump time
         }
     }
 
-    visionAngle = Mathf.Repeat(visionAngle, 360f);
+    private bool IsGrounded()
+    {
+        // Check if the agent is on the ground using a raycast
+        return Physics.Raycast(transform.position, Vector3.down, 1.1f);
+    }
 
-<<<<<<< Updated upstream
-    transform.Rotate(rotateDir, Time.deltaTime * 100f);
-    agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
-        ForceMode.VelocityChange);
-=======
-    transform.Rotate(rotateDir, Time.deltaTime * 150f);
-    agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
+    private void Jump()
+    {
+        // Apply an upward force to make the agent jump
+        agentRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
 
-    JumpIfNeeded(); // Call the jump logic here
->>>>>>> Stashed changes
-}
+    public void MoveAgent(ActionSegment<int> act)
+    {
+        var dirToGo = Vector3.zero;
+        var rotateDir = Vector3.zero;
 
+        m_KickPower = 0f;
 
+        var forwardAxis = act[0];
+        var rightAxis = act[1];
+        var rotateAxis = act[2];
+        var visionAxis = act.Length > 3 ? act[3] : 0; // Safeguard against index out of range
+
+        switch (forwardAxis)
+        {
+            case 1:
+                dirToGo = transform.forward * m_ForwardSpeed;
+                m_KickPower = 1f;
+                break;
+            case 2:
+                dirToGo = transform.forward * -m_ForwardSpeed;
+                break;
+        }
+
+        switch (rightAxis)
+        {
+            case 1:
+                dirToGo = transform.right * m_LateralSpeed;
+                break;
+            case 2:
+                dirToGo = transform.right * -m_LateralSpeed;
+                break;
+        }
+
+        switch (rotateAxis)
+        {
+            case 1:
+                rotateDir = transform.up * -1f;
+                break;
+            case 2:
+                rotateDir = transform.up * 1f;
+                break;
+        }
+
+        // Adjust vision angle only if available
+        if (act.Length > 3)
+        {
+            switch (visionAxis)
+            {
+                case 1:
+                    visionAngle -= 360f; // Look left
+                    break;
+                case 2:
+                    visionAngle += 360f; // Look right
+                    break;
+            }
+        }
+
+        // Clamp vision angle to 360 degrees
+        visionAngle = Mathf.Repeat(visionAngle, 360f);
+
+        transform.Rotate(rotateDir, Time.deltaTime * 150f);
+        agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
+            ForceMode.VelocityChange);
+    }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
@@ -204,7 +197,7 @@ public void MoveAgent(ActionSegment<int> act)
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
-        //forward
+        // Forward
         if (Input.GetKey(KeyCode.W))
         {
             discreteActionsOut[0] = 1;
@@ -213,7 +206,7 @@ public void MoveAgent(ActionSegment<int> act)
         {
             discreteActionsOut[0] = 2;
         }
-        //rotate
+        // Rotate
         if (Input.GetKey(KeyCode.A))
         {
             discreteActionsOut[2] = 1;
@@ -222,7 +215,7 @@ public void MoveAgent(ActionSegment<int> act)
         {
             discreteActionsOut[2] = 2;
         }
-        //right
+        // Right
         if (Input.GetKey(KeyCode.E))
         {
             discreteActionsOut[1] = 1;
@@ -231,7 +224,7 @@ public void MoveAgent(ActionSegment<int> act)
         {
             discreteActionsOut[1] = 2;
         }
-        //vision
+        // Vision
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             discreteActionsOut[3] = 1;
