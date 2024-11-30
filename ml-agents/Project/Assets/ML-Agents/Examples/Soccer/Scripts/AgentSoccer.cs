@@ -42,6 +42,9 @@ public class AgentSoccer : Agent
 
     EnvironmentParameters m_ResetParams;
 
+    private float lastJumpTime = -5f; // Tracks the last time the agent jumped
+    private float jumpCooldown = 5f; // Cooldown duration in seconds
+
     public override void Initialize()
     {
         SoccerEnvController envController = GetComponentInParent<SoccerEnvController>();
@@ -228,10 +231,38 @@ public class AgentSoccer : Agent
 
     void Jump()
     {
-        if (Mathf.Abs(agentRb.velocity.y) < 0.01f) // Check if grounded
+        // Check if the agent is grounded and cooldown period has passed
+        if (IsGrounded() && Time.time >= lastJumpTime + jumpCooldown)
         {
-            agentRb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
-            Debug.Log("Agent jumped due to sound detection!");
+            // Apply upward jump force
+            agentRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            lastJumpTime = Time.time; // Update the last jump time
+            Debug.Log("Agent jumped!");
+        }
+        else if (Time.time < lastJumpTime + jumpCooldown)
+        {
+            Debug.Log("Jump on cooldown!");
+        }
+    }
+
+    // Helper method to check if the agent is grounded
+    bool IsGrounded()
+    {
+        RaycastHit hit;
+        // Cast a ray down from the agent's position to detect the ground
+        return Physics.Raycast(transform.position, Vector3.down, out hit, 0.6f);
+    }
+
+    // Update method to simulate falling with additional effects
+    void Update()
+    {
+        if (!IsGrounded())
+        {
+            // Apply a slight downward force to simulate realistic gravity effects
+            agentRb.AddForce(Vector3.down * 60f, ForceMode.Acceleration);
+
+            // Optionally add rotation for a falling pose
+            agentRb.AddTorque(new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)) * 10f, ForceMode.Force);
         }
     }
 }
