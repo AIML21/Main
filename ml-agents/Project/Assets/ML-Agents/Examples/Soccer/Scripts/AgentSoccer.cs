@@ -158,6 +158,31 @@ public class AgentSoccer : Agent
             AddReward(-m_Existential);
         }
         MoveAgent(actionBuffers.DiscreteActions);
+
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, hearingRadius);
+        foreach (var obj in nearbyObjects)
+        {
+            if (obj.CompareTag("ball"))
+            {
+                // Look at the ball
+                Vector3 directionToBall = (obj.transform.position - transform.position).normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(directionToBall);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+
+                // Add reward for facing the ball
+                float dotProduct = Vector3.Dot(transform.forward, directionToBall);
+                if (dotProduct > 0.9f) // The agent is almost directly facing the ball
+                {
+                    AddReward(0.01f);
+                }
+
+                // Add reward for moving toward the ball
+                if (Vector3.Distance(transform.position, obj.transform.position) < hearingRadius / 2)
+                {
+                    AddReward(0.02f);
+                }
+            }
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -226,27 +251,36 @@ public class AgentSoccer : Agent
         Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, hearingRadius);
         int detectedObjectsCount = 0;
         int maxDetectedObjects = 4;
+
         foreach (var obj in nearbyObjects)
         {
-            if (obj.gameObject == gameObject) continue; 
+            if (obj.gameObject == gameObject) continue;
 
+            Vector3 relativePosition = obj.transform.position - transform.position;
             Rigidbody rb = obj.GetComponent<Rigidbody>();
-            if (rb != null && rb.velocity.magnitude > 0.1f) 
-            {
-                if (detectedObjectsCount >= maxDetectedObjects) break;
 
-                Vector3 relativePosition = obj.transform.position - transform.position;
-                sensor.AddObservation(relativePosition.normalized); 
-                sensor.AddObservation(relativePosition.magnitude / hearingRadius); 
-                sensor.AddObservation(rb.velocity.magnitude / hearingRadius); 
+            if (obj.CompareTag("ball"))
+            {
+                sensor.AddObservation(relativePosition.normalized); // Ball direction
+                sensor.AddObservation(relativePosition.magnitude / hearingRadius); // Ball distance
+                sensor.AddObservation(rb != null ? rb.velocity.magnitude / hearingRadius : 0f);
+                detectedObjectsCount++;
+            }
+            else if (rb != null && rb.velocity.magnitude > 0.1f && detectedObjectsCount < maxDetectedObjects)
+            {
+                sensor.AddObservation(relativePosition.normalized); // Object direction
+                sensor.AddObservation(relativePosition.magnitude / hearingRadius); // Object distance
+                sensor.AddObservation(rb.velocity.magnitude / hearingRadius); // Object velocity
                 detectedObjectsCount++;
             }
         }
+
+        // Pad missing observations
         while (detectedObjectsCount < maxDetectedObjects)
         {
-            sensor.AddObservation(Vector3.zero); 
-            sensor.AddObservation(0f); 
-            sensor.AddObservation(0f); 
+            sensor.AddObservation(Vector3.zero);
+            sensor.AddObservation(0f);
+            sensor.AddObservation(0f);
             detectedObjectsCount++;
         }
     }
