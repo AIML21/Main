@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using System.Linq;
 
 public enum Team
 {
@@ -48,6 +49,11 @@ public class AgentSoccer : Agent
 
     EnvironmentParameters m_ResetParams;
 
+    private GameObject m_OwnGoal;
+    private GameObject m_OpponentGoal;
+    private const float k_GoalieDistancePenalty = 0.1f;
+    private const float k_DirectionalKickReward = 0.5f;
+
     public override void Initialize()
     {
         SoccerEnvController envController = GetComponentInParent<SoccerEnvController>();
@@ -61,6 +67,19 @@ public class AgentSoccer : Agent
         }
 
         m_BehaviorParameters = gameObject.GetComponent<BehaviorParameters>();
+        
+        // Assign position based on object name - if it has (1) it's a goalie, otherwise striker
+        if (gameObject.name.Contains("(1)"))
+        {
+            position = Position.Goalie;
+            Debug.Log($"Agent {gameObject.name} assigned as Goalie");
+        }
+        else
+        {
+            position = Position.Striker;
+            Debug.Log($"Agent {gameObject.name} assigned as Striker");
+        }
+
         if (m_BehaviorParameters.TeamId == (int)Team.Blue)
         {
             team = Team.Blue;
@@ -73,6 +92,8 @@ public class AgentSoccer : Agent
             initialPos = new Vector3(transform.position.x + 5f, .5f, transform.position.z);
             rotSign = -1f;
         }
+
+        // Set speeds based on position
         if (position == Position.Goalie)
         {
             m_LateralSpeed = 1.0f;
@@ -83,16 +104,44 @@ public class AgentSoccer : Agent
             m_LateralSpeed = 0.3f;
             m_ForwardSpeed = 1.3f;
         }
-        else
-        {
-            m_LateralSpeed = 0.3f;
-            m_ForwardSpeed = 1.0f;
-        }
+
         m_SoccerSettings = FindObjectOfType<SoccerSettings>();
         agentRb = GetComponent<Rigidbody>();
         agentRb.maxAngularVelocity = 500;
 
         m_ResetParams = Academy.Instance.EnvironmentParameters;
+
+        if (team == Team.Blue)
+        {
+            m_OwnGoal = envController.transform.Find("BlueGoal")?.gameObject;
+            m_OpponentGoal = envController.transform.Find("PurpleGoal")?.gameObject;
+            
+            if (m_OwnGoal == null)
+            {
+                m_OwnGoal = envController.GetComponentsInChildren<Transform>()
+                    .FirstOrDefault(t => t.CompareTag("blueGoal"))?.gameObject;
+                m_OpponentGoal = envController.GetComponentsInChildren<Transform>()
+                    .FirstOrDefault(t => t.CompareTag("purpleGoal"))?.gameObject;
+            }
+        }
+        else
+        {
+            m_OwnGoal = envController.transform.Find("PurpleGoal")?.gameObject;
+            m_OpponentGoal = envController.transform.Find("BlueGoal")?.gameObject;
+            
+            if (m_OwnGoal == null)
+            {
+                m_OwnGoal = envController.GetComponentsInChildren<Transform>()
+                    .FirstOrDefault(t => t.CompareTag("purpleGoal"))?.gameObject;
+                m_OpponentGoal = envController.GetComponentsInChildren<Transform>()
+                    .FirstOrDefault(t => t.CompareTag("blueGoal"))?.gameObject;
+            }
+        }
+
+        if (m_OwnGoal == null || m_OpponentGoal == null)
+        {
+            Debug.LogError($"Could not find goals for agent {gameObject.name} in environment {envController.name}");
+        }
     }
 
     public void MoveAgent(ActionSegment<int> act)
@@ -150,6 +199,14 @@ public class AgentSoccer : Agent
         {
             // Existential bonus for Goalies.
             AddReward(m_Existential);
+            
+            // Add distance-based penalty for goalies
+            float distanceFromGoal = Vector3.Distance(transform.position, m_OwnGoal.transform.position);
+            float penaltyMultiplier = Mathf.Clamp01(distanceFromGoal / 10f); // Adjust 10f based on field size
+            AddReward(-penaltyMultiplier * k_GoalieDistancePenalty);
+            
+            // Debug visualization of distance
+            Debug.DrawLine(transform.position, m_OwnGoal.transform.position, Color.red);
         }
         else if (position == Position.Striker)
         {
@@ -202,9 +259,40 @@ public class AgentSoccer : Agent
         }
         if (c.gameObject.CompareTag("ball"))
         {
+            // Base reward for touching the ball
             AddReward(.2f * m_BallTouch);
+            
             var dir = c.contacts[0].point - transform.position;
             dir = dir.normalized;
+            
+            // Calculate direction to opponent's goal
+            Vector3 ballToGoal = m_OpponentGoal.transform.position - c.gameObject.transform.position;
+            ballToGoal.y = 0; // Ignore vertical component
+            ballToGoal.Normalize();
+            
+            // Calculate angle between kick direction and ideal direction
+            float dotProduct = Vector3.Dot(dir, ballToGoal);
+            // Convert dot product to angle (0 to 180 degrees)
+            float angle = Mathf.Acos(dotProduct) * Mathf.Rad2Deg;
+            
+            // Calculate direction reward (1.0 when angle is 0, 0.0 when angle is 180)
+            float directionReward = Mathf.Max(0, (180f - angle) / 180f);
+            
+            // Calculate kick strength reward (based on m_KickPower which is 0-1)
+            float strengthReward = m_KickPower;
+            
+            // Combine direction and strength rewards
+            float kickReward = directionReward * strengthReward * k_DirectionalKickReward;
+            AddReward(kickReward);
+            
+            // Debug visualization - make lines thicker and last longer
+            Debug.DrawRay(c.gameObject.transform.position, dir * 10f, Color.blue, 3f); // Actual kick direction
+            Debug.DrawRay(c.gameObject.transform.position, ballToGoal * 10f, Color.green, 3f); // Ideal direction
+            
+            // Debug.Log for monitoring rewards
+            Debug.Log($"Kick Reward: {kickReward:F2} (Direction: {directionReward:F2}, Strength: {strengthReward:F2}, Angle: {angle:F1}°)");
+            
+            // Apply force to ball
             c.gameObject.GetComponent<Rigidbody>().AddForce(dir * force);
         }
     }
@@ -212,6 +300,39 @@ public class AgentSoccer : Agent
     public override void OnEpisodeBegin()
     {
         m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || m_OpponentGoal == null || m_OwnGoal == null) return;
+
+        // Draw lines for all agents
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, m_OpponentGoal.transform.position);
+
+        //print own position
+        Debug.Log("Own position: " + position);
+        
+        // For goalies, also draw the line to their own goal
+        if (position == Position.Goalie)
+        {
+
+            //log that we are drawing the line
+            Debug.Log("Drawing line to own goal");
+            // Make the line bright red and thicker using Debug.DrawLine instead
+            Debug.DrawLine(
+                transform.position, 
+                m_OwnGoal.transform.position, 
+                new Color(1f, 0f, 0f, 1f), // Bright red
+                0f, // Duration (0 means single frame)
+                false // Depth testing
+            );
+            
+            // Also draw a thicker line with Gizmos as backup
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, m_OwnGoal.transform.position);
+            
+        }
     }
 
 }
