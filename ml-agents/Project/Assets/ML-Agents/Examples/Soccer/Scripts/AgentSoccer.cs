@@ -4,6 +4,7 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using System.Linq;
+using System.Collections.Generic;
 
 public enum Team
 {
@@ -70,18 +71,42 @@ public class AgentSoccer : Agent
         m_BehaviorParameters = GetComponent<BehaviorParameters>();
         if (m_BehaviorParameters != null)
         {
-            // Set inference device to ComputeShader
             m_BehaviorParameters.InferenceDevice = InferenceDevice.ComputeShader;
             
             // Configure the action space (3 branches of size 3 each)
             var actionSpec = ActionSpec.MakeDiscrete(3, 3, 3);
             m_BehaviorParameters.BrainParameters.ActionSpec = actionSpec;
             
-            // Set vector observation size to 0 since we're using sensors
-            m_BehaviorParameters.BrainParameters.VectorObservationSize = 0;
-            m_BehaviorParameters.BrainParameters.NumStackedVectorObservations = 1;
+            // Calculate expected observation size
+            var raySensor = GetComponent<RayPerceptionSensorComponent3D>();
+            int rayObservations = 0;
+            if (raySensor != null)
+            {
+                int totalRays = raySensor.RaysPerDirection * 2 + 1; // +1 for the center ray
+                int observationsPerRay = 3; // distance, hit, tag
+                int observationsPerFrame = totalRays * observationsPerRay;
+                rayObservations = observationsPerFrame * RayPerceptionSensorComponent3D.MEMORY_FRAMES;
+                
+                Debug.Log($"Ray Memory setup:" +
+                         $"\n - Rays per frame: {totalRays}" +
+                         $"\n - Values per ray: {observationsPerRay}" +
+                         $"\n - Memory frames: {RayPerceptionSensorComponent3D.MEMORY_FRAMES}" +
+                         $"\n - Total ray observations: {rayObservations}");
+            }
             
-            // Enable child sensors for the memory system
+            // Base observations per frame
+            int baseObservationsPerFrame = 21; // 7 (self) + 6 (ball) + 6 (goals) + 2 (team/role)
+            int totalBaseObservations = baseObservationsPerFrame * RayPerceptionSensorComponent3D.MEMORY_FRAMES;
+            
+            int totalObservations = totalBaseObservations + rayObservations;
+            m_BehaviorParameters.BrainParameters.VectorObservationSize = totalObservations;
+            
+            Debug.Log($"Total observation setup:" +
+                     $"\n - Base per frame: {baseObservationsPerFrame}" +
+                     $"\n - Memory frames: {RayPerceptionSensorComponent3D.MEMORY_FRAMES}" +
+                     $"\n - Total observations: {totalObservations}");
+            
+            m_BehaviorParameters.BrainParameters.NumStackedVectorObservations = 1;
             m_BehaviorParameters.UseChildSensors = true;
         }
 
@@ -380,21 +405,75 @@ public class AgentSoccer : Agent
     {
         if (sensor == null) return;
 
-        // Add self observations (7 values)
-        sensor.AddObservation(transform.position); // 3 values
-        sensor.AddObservation(transform.forward); // 3 values
-        sensor.AddObservation(agentRb.velocity.magnitude); // 1 value
-        
-        // Add memory observations from ray sensor
         var raySensor = GetComponent<RayPerceptionSensorComponent3D>();
-        if (raySensor != null)
+        if (raySensor == null) return;
+
+        // Get access to the memory queues
+        var rayMemory = raySensor.GetType().GetField("m_RayMemory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(raySensor) as Queue<RayPerceptionOutput>;
+        
+        if (rayMemory == null)
         {
-            var memoryObs = raySensor.GetMemoryObservations();
-            if (memoryObs != null)
+            Debug.LogError("Could not access ray memory queue");
+            return;
+        }
+
+        int observationCount = 0;
+
+        // Iterate through memory frames
+        foreach (var memoryFrame in rayMemory)
+        {
+            // Basic observations (7 values)
+            sensor.AddObservation(transform.position); // 3 values
+            sensor.AddObservation(transform.forward); // 3 values
+            sensor.AddObservation(agentRb.velocity.magnitude); // 1 value
+            observationCount += 7;
+
+            // Ball observations (6 values)
+            if (m_Ball != null)
             {
-                sensor.AddObservation(memoryObs);
+                var ballRb = m_Ball.GetComponent<Rigidbody>();
+                sensor.AddObservation(m_Ball.transform.position); // 3 values
+                sensor.AddObservation(ballRb.velocity); // 3 values
+            }
+            else
+            {
+                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
+                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
+            }
+            observationCount += 6;
+
+            // Goal positions (6 values)
+            if (m_OwnGoal != null && m_OpponentGoal != null)
+            {
+                sensor.AddObservation(m_OwnGoal.transform.position); // 3 values
+                sensor.AddObservation(m_OpponentGoal.transform.position); // 3 values
+            }
+            else
+            {
+                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
+                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
+            }
+            observationCount += 6;
+
+            // Team and role information (2 values)
+            sensor.AddObservation((int)team);
+            sensor.AddObservation((int)position);
+            observationCount += 2;
+
+            // Add ray observations for this frame
+            if (memoryFrame?.RayOutputs != null)
+            {
+                foreach (var ray in memoryFrame.RayOutputs)
+                {
+                    sensor.AddObservation(ray.HitFraction);
+                    sensor.AddObservation(ray.HasHit ? 1 : 0);
+                    sensor.AddObservation(ray.HitTagIndex);
+                    observationCount += 3;
+                }
             }
         }
+
+        Debug.Log($"Total observations sent: {observationCount}");
     }
 
 }

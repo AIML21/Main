@@ -10,7 +10,7 @@ namespace Unity.MLAgents.Sensors
     [AddComponentMenu("ML Agents/Ray Perception Sensor 3D", (int)MenuGroup.Sensors)]
     public class RayPerceptionSensorComponent3D : RayPerceptionSensorComponentBase
     {
-        private const int MEMORY_FRAMES = 30;
+        public const int MEMORY_FRAMES = 30;
         private const int DEFAULT_NUM_RAYS = 11;
         private Queue<RayPerceptionOutput> m_RayMemory;
         private Queue<Dictionary<GameObject, RelativeObjectData>> m_ObjectMemory;
