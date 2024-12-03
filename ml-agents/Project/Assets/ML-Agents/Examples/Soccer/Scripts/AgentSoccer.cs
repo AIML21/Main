@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using Unity.MLAgents.Sensors;
 using System.Linq;
 
 public enum Team
@@ -30,15 +31,12 @@ public class AgentSoccer : Agent
     [HideInInspector]
     public Team team;
     float m_KickPower;
-    // The coefficient for the reward for colliding with a ball. Set using curriculum.
-    // float m_BallTouch;
     public Position position;
 
     const float k_Power = 2000f;
     float m_Existential;
     float m_LateralSpeed;
     float m_ForwardSpeed;
-
 
     [HideInInspector]
     public Rigidbody agentRb;
@@ -53,9 +51,9 @@ public class AgentSoccer : Agent
     private GameObject m_OpponentGoal;
     private const float k_GoalieDistancePenalty = 0.01f;
     private const float k_DirectionalKickReward = 0.05f;
-    private const float k_BallVisibleReward = 0.001f;  // Small reward per step for looking at ball
-    private const float k_BallNotVisiblePenalty = -0.001f;  // Small penalty per step for looking away
-    private GameObject m_Ball;  // Reference to the ball
+    private const float k_BallVisibleReward = 0.001f;
+    private const float k_BallNotVisiblePenalty = -0.001f;
+    private GameObject m_Ball;
 
     public override void Initialize()
     {
@@ -69,8 +67,24 @@ public class AgentSoccer : Agent
             m_Existential = 1f / MaxStep;
         }
 
-        m_BehaviorParameters = gameObject.GetComponent<BehaviorParameters>();
-        
+        m_BehaviorParameters = GetComponent<BehaviorParameters>();
+        if (m_BehaviorParameters != null)
+        {
+            // Set inference device to ComputeShader
+            m_BehaviorParameters.InferenceDevice = InferenceDevice.ComputeShader;
+            
+            // Configure the action space (3 branches of size 3 each)
+            var actionSpec = ActionSpec.MakeDiscrete(3, 3, 3);
+            m_BehaviorParameters.BrainParameters.ActionSpec = actionSpec;
+            
+            // Set vector observation size to 0 since we're using sensors
+            m_BehaviorParameters.BrainParameters.VectorObservationSize = 0;
+            m_BehaviorParameters.BrainParameters.NumStackedVectorObservations = 1;
+            
+            // Enable child sensors for the memory system
+            m_BehaviorParameters.UseChildSensors = true;
+        }
+
         // Assign position based on object name - if it has (1) it's a goalie, otherwise striker
         if (gameObject.name.Contains("(1)"))
         {
@@ -146,7 +160,7 @@ public class AgentSoccer : Agent
             Debug.LogError($"Could not find goals for agent {gameObject.name} in environment {envController.name}");
         }
 
-        m_Ball = envController.ball;  // Get ball reference from environment controller
+        m_Ball = envController.ball;
     }
 
     public void MoveAgent(ActionSegment<int> act)
@@ -197,8 +211,21 @@ public class AgentSoccer : Agent
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
-
     {
+        // Get ray observations from sensor
+        var raySensor = GetComponent<RayPerceptionSensorComponent3D>();
+        if (raySensor != null && raySensor.RaySensor != null)
+        {
+            var rayPerceptionOutput = raySensor.RaySensor.RayPerceptionOutput;
+            
+            // Update memory in ray sensor
+            var players = GameObject.FindGameObjectsWithTag("agent");
+            var trackedObjects = new GameObject[players.Length + 1];
+            players.CopyTo(trackedObjects, 0);
+            trackedObjects[players.Length] = m_Ball;
+            
+            raySensor.UpdateMemory(rayPerceptionOutput, trackedObjects);
+        }
 
         if (position == Position.Goalie)
         {
@@ -313,8 +340,7 @@ public class AgentSoccer : Agent
 
     public override void OnEpisodeBegin()
     {
-        // Remove this line:
-        // m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
+        // No need for initialization check here
     }
 
     private void OnDrawGizmos()
@@ -347,6 +373,27 @@ public class AgentSoccer : Agent
             Gizmos.color = Color.red;
             Gizmos.DrawLine(transform.position, m_OwnGoal.transform.position);
             
+        }
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        if (sensor == null) return;
+
+        // Add self observations (7 values)
+        sensor.AddObservation(transform.position); // 3 values
+        sensor.AddObservation(transform.forward); // 3 values
+        sensor.AddObservation(agentRb.velocity.magnitude); // 1 value
+        
+        // Add memory observations from ray sensor
+        var raySensor = GetComponent<RayPerceptionSensorComponent3D>();
+        if (raySensor != null)
+        {
+            var memoryObs = raySensor.GetMemoryObservations();
+            if (memoryObs != null)
+            {
+                sensor.AddObservation(memoryObs);
+            }
         }
     }
 
