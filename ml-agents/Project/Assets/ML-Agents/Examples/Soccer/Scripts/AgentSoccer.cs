@@ -31,7 +31,7 @@ public class AgentSoccer : Agent
     public Team team;
     float m_KickPower;
     // The coefficient for the reward for colliding with a ball. Set using curriculum.
-    float m_BallTouch;
+    // float m_BallTouch;
     public Position position;
 
     const float k_Power = 2000f;
@@ -51,8 +51,11 @@ public class AgentSoccer : Agent
 
     private GameObject m_OwnGoal;
     private GameObject m_OpponentGoal;
-    private const float k_GoalieDistancePenalty = 0.1f;
-    private const float k_DirectionalKickReward = 0.5f;
+    private const float k_GoalieDistancePenalty = 0.01f;
+    private const float k_DirectionalKickReward = 0.05f;
+    private const float k_BallVisibleReward = 0.001f;  // Small reward per step for looking at ball
+    private const float k_BallNotVisiblePenalty = -0.001f;  // Small penalty per step for looking away
+    private GameObject m_Ball;  // Reference to the ball
 
     public override void Initialize()
     {
@@ -142,6 +145,8 @@ public class AgentSoccer : Agent
         {
             Debug.LogError($"Could not find goals for agent {gameObject.name} in environment {envController.name}");
         }
+
+        m_Ball = envController.ball;  // Get ball reference from environment controller
     }
 
     public void MoveAgent(ActionSegment<int> act)
@@ -197,9 +202,6 @@ public class AgentSoccer : Agent
 
         if (position == Position.Goalie)
         {
-            // Existential bonus for Goalies.
-            AddReward(m_Existential);
-            
             // Add distance-based penalty for goalies
             float distanceFromGoal = Vector3.Distance(transform.position, m_OwnGoal.transform.position);
             float penaltyMultiplier = Mathf.Clamp01(distanceFromGoal / 10f); // Adjust 10f based on field size
@@ -208,11 +210,32 @@ public class AgentSoccer : Agent
             // Debug visualization of distance
             Debug.DrawLine(transform.position, m_OwnGoal.transform.position, Color.red);
         }
-        else if (position == Position.Striker)
+
+        // Calculate if ball is visible (in front of the agent)
+        Vector3 ballDirection = m_Ball.transform.position - transform.position;
+        ballDirection.y = 0;  // Ignore height difference
+        ballDirection.Normalize();
+        
+        float visibilityDot = Vector3.Dot(transform.forward, ballDirection);
+        
+        // Reward/penalize based on ball visibility
+        if (visibilityDot > 0.5f)  // Ball is in front (within ~90 degree cone)
         {
-            // Existential penalty for Strikers
-            AddReward(-m_Existential);
+            AddReward(k_BallVisibleReward * visibilityDot);  // More reward when looking directly at ball
+            
+            // Debug visualization
+            Debug.DrawRay(transform.position, transform.forward * 2f, Color.green);
+            Debug.DrawLine(transform.position, m_Ball.transform.position, Color.green);
         }
+        else
+        {
+            AddReward(k_BallNotVisiblePenalty);  // Penalty for looking away
+            
+            // Debug visualization
+            Debug.DrawRay(transform.position, transform.forward * 2f, Color.red);
+            Debug.DrawLine(transform.position, m_Ball.transform.position, Color.red);
+        }
+
         MoveAgent(actionBuffers.DiscreteActions);
     }
 
@@ -259,9 +282,6 @@ public class AgentSoccer : Agent
         }
         if (c.gameObject.CompareTag("ball"))
         {
-            // Base reward for touching the ball
-            AddReward(.2f * m_BallTouch);
-            
             var dir = c.contacts[0].point - transform.position;
             dir = dir.normalized;
             
@@ -272,16 +292,10 @@ public class AgentSoccer : Agent
             
             // Calculate angle between kick direction and ideal direction
             float dotProduct = Vector3.Dot(dir, ballToGoal);
-            // Convert dot product to angle (0 to 180 degrees)
             float angle = Mathf.Acos(dotProduct) * Mathf.Rad2Deg;
             
-            // Calculate direction reward (1.0 when angle is 0, 0.0 when angle is 180)
-            float directionReward = Mathf.Max(0, (180f - angle) / 180f);
-            
-            // Calculate kick strength reward (based on m_KickPower which is 0-1)
+            float directionReward = dotProduct; // -1.0 to 1.0 range
             float strengthReward = m_KickPower;
-            
-            // Combine direction and strength rewards
             float kickReward = directionReward * strengthReward * k_DirectionalKickReward;
             AddReward(kickReward);
             
@@ -299,7 +313,8 @@ public class AgentSoccer : Agent
 
     public override void OnEpisodeBegin()
     {
-        m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
+        // Remove this line:
+        // m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
     }
 
     private void OnDrawGizmos()
