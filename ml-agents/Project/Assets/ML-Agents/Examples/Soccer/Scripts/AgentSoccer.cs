@@ -71,7 +71,7 @@ public class AgentSoccer : Agent
         m_BehaviorParameters = GetComponent<BehaviorParameters>();
         if (m_BehaviorParameters != null)
         {
-            m_BehaviorParameters.InferenceDevice = InferenceDevice.ComputeShader;
+            m_BehaviorParameters.InferenceDevice = InferenceDevice.Burst;
             
             // Configure the action space (3 branches of size 3 each)
             var actionSpec = ActionSpec.MakeDiscrete(3, 3, 3);
@@ -83,26 +83,36 @@ public class AgentSoccer : Agent
             if (raySensor != null)
             {
                 int totalRays = raySensor.RaysPerDirection * 2 + 1; // +1 for the center ray
-                int observationsPerRay = 3; // distance, hit, tag
-                int observationsPerFrame = totalRays * observationsPerRay;
-                rayObservations = observationsPerFrame * RayPerceptionSensorComponent3D.MEMORY_FRAMES;
+                int observationsPerRay = 3;  // distance, hit, tag
+                int rayObservationsPerFrame = totalRays * observationsPerRay;
+                rayObservations = rayObservationsPerFrame * RayPerceptionSensorComponent3D.MEMORY_FRAMES;
                 
                 Debug.Log($"Ray Memory setup:" +
                          $"\n - Rays per frame: {totalRays}" +
                          $"\n - Values per ray: {observationsPerRay}" +
-                         $"\n - Memory frames: {RayPerceptionSensorComponent3D.MEMORY_FRAMES}" +
-                         $"\n - Total ray observations: {rayObservations}");
+                         $"\n - Ray observations per frame: {rayObservationsPerFrame}");
             }
             
-            // Base observations per frame
-            int baseObservationsPerFrame = 21; // 7 (self) + 6 (ball) + 6 (goals) + 2 (team/role)
+            // Base observations per frame:
+            // - Agent velocity (forward/back, right/left) = 2
+            // - Agent angular velocity = 1
+            // - Goals (distance + angle for each) = 4
+            // - Team and role = 2
+            // - Ball (distance + angle + forward/back vel + right/left vel) = 4
+            int baseObservationsPerFrame = 13;  // 2 + 1 + 4 + 2 + 4
             int totalBaseObservations = baseObservationsPerFrame * RayPerceptionSensorComponent3D.MEMORY_FRAMES;
             
             int totalObservations = totalBaseObservations + rayObservations;
             m_BehaviorParameters.BrainParameters.VectorObservationSize = totalObservations;
             
             Debug.Log($"Total observation setup:" +
+                     $"\n - Agent movement: 3 (2 velocity + 1 angular)" +
+                     $"\n - Goals: 4 (2 per goal: distance + angle)" +
+                     $"\n - Team/Role: 2" +
+                     $"\n - Ball: 4 (distance + angle + 2 velocity)" +
                      $"\n - Base per frame: {baseObservationsPerFrame}" +
+                     $"\n - Ray observations per frame: {rayObservations / RayPerceptionSensorComponent3D.MEMORY_FRAMES}" +
+                     $"\n - Total per frame: {totalObservations / RayPerceptionSensorComponent3D.MEMORY_FRAMES}" +
                      $"\n - Memory frames: {RayPerceptionSensorComponent3D.MEMORY_FRAMES}" +
                      $"\n - Total observations: {totalObservations}");
             
@@ -370,34 +380,89 @@ public class AgentSoccer : Agent
 
     private void OnDrawGizmos()
     {
-        if (!Application.isPlaying || m_OpponentGoal == null || m_OwnGoal == null) return;
+        if (!Application.isPlaying || !enabled) return;
 
-        // Draw lines for all agents
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, m_OpponentGoal.transform.position);
+        var raySensor = GetComponent<RayPerceptionSensorComponent3D>();
+        if (raySensor == null) return;
 
-        //print own position
-        Debug.Log("Own position: " + position);
+        // Get memory queue through reflection (same as in CollectObservations)
+        var rayMemory = raySensor.GetType().GetField("m_RayMemory", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(raySensor) as Queue<RayPerceptionOutput>;
         
-        // For goalies, also draw the line to their own goal
-        if (position == Position.Goalie)
-        {
+        if (rayMemory == null) return;
 
-            //log that we are drawing the line
-            Debug.Log("Drawing line to own goal");
-            // Make the line bright red and thicker using Debug.DrawLine instead
-            Debug.DrawLine(
-                transform.position, 
-                m_OwnGoal.transform.position, 
-                new Color(1f, 0f, 0f, 1f), // Bright red
-                0f, // Duration (0 means single frame)
-                false // Depth testing
-            );
+        // Draw memory frames with different alpha values
+        int frameCount = 0;
+        foreach (var memoryFrame in rayMemory)
+        {
+            float alpha = 1f - (frameCount / (float)RayPerceptionSensorComponent3D.MEMORY_FRAMES);
+            Color currentColor = new Color(1f, 1f, 1f, alpha);
+            Color ballColor = new Color(1f, 0.92f, 0.016f, alpha); // Yellow for ball
+            Color goalColor = new Color(0f, 1f, 0f, alpha);  // Green for goals
+
+            // Draw rays for this frame
+            if (memoryFrame?.RayOutputs != null)
+            {
+                foreach (var ray in memoryFrame.RayOutputs)
+                {
+                    // Calculate ray direction based on ray index
+                    // (You'll need to replicate the ray direction calculation from RayPerceptionSensorComponent3D)
+                    Vector3 rayDirection = transform.forward; // This needs proper calculation
+                    
+                    Vector3 rayStart = transform.position;
+                    Vector3 rayEnd = rayStart + rayDirection * (ray.HasHit ? ray.HitFraction * raySensor.RayLength : raySensor.RayLength);
+                    
+                    // Color based on what was hit
+                    Color rayColor = ray.HasHit ? 
+                        (ray.HitTagIndex == 0 ? ballColor : currentColor) : // Yellow for ball hits
+                        new Color(0.5f, 0.5f, 0.5f, alpha * 0.5f);  // Grey for misses
+                    
+                    Debug.DrawLine(rayStart, rayEnd, rayColor);
+                }
+            }
+
+            // Draw ball position and velocity if seen in this frame
             
-            // Also draw a thicker line with Gizmos as backup
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, m_OwnGoal.transform.position);
-            
+            if (memoryFrame?.RayOutputs != null && m_Ball != null)
+            {
+                foreach (var ray in memoryFrame.RayOutputs)
+                {
+                    if (ray.HasHit && ray.HitTagIndex == 0)
+                    {
+                        
+                        Vector3 toBall = m_Ball.transform.position - transform.position;
+                        float ballDistance = toBall.magnitude;
+                        float ballAngle = Vector3.SignedAngle(transform.forward, toBall, Vector3.up);
+                        
+                        // Draw line to ball
+                        Debug.DrawLine(transform.position, m_Ball.transform.position, ballColor);
+                        
+                        // Draw ball velocity
+                        var ballRb = m_Ball.GetComponent<Rigidbody>();
+                        if (ballRb != null)
+                        {
+                            Vector3 relativeVel = transform.InverseTransformDirection(ballRb.velocity - agentRb.velocity);
+                            Debug.DrawRay(m_Ball.transform.position, relativeVel, 
+                                new Color(1f, 0f, 0f, alpha)); // Red for velocity
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+
+            // Draw goal observations
+            if (m_OwnGoal != null && m_OpponentGoal != null)
+            {
+                Color ownGoalColor = new Color(1f, 0f, 0f, alpha);
+                Color oppGoalColor = new Color(0f, 0f, 1f, alpha);
+                
+                Debug.DrawLine(transform.position, m_OwnGoal.transform.position, ownGoalColor);
+                Debug.DrawLine(transform.position, m_OpponentGoal.transform.position, oppGoalColor);
+            }
+
+            frameCount++;
         }
     }
 
@@ -408,8 +473,9 @@ public class AgentSoccer : Agent
         var raySensor = GetComponent<RayPerceptionSensorComponent3D>();
         if (raySensor == null) return;
 
-        // Get access to the memory queues
-        var rayMemory = raySensor.GetType().GetField("m_RayMemory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(raySensor) as Queue<RayPerceptionOutput>;
+        var rayMemory = raySensor.GetType().GetField("m_RayMemory", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(raySensor) as Queue<RayPerceptionOutput>;
         
         if (rayMemory == null)
         {
@@ -418,62 +484,123 @@ public class AgentSoccer : Agent
         }
 
         int observationCount = 0;
+        float rayLength = raySensor.RayLength;
+        const float MAX_VELOCITY = 30f;
 
-        // Iterate through memory frames
         foreach (var memoryFrame in rayMemory)
         {
-            // Basic observations (7 values)
-            sensor.AddObservation(transform.position); // 3 values
-            sensor.AddObservation(transform.forward); // 3 values
-            sensor.AddObservation(agentRb.velocity.magnitude); // 1 value
-            observationCount += 7;
+            // Agent's velocity (2 values: forward/back and right/left speed)
+            Vector3 localVelocity = transform.InverseTransformDirection(agentRb.velocity);
+            sensor.AddObservation(localVelocity.z / MAX_VELOCITY);  // forward/back
+            sensor.AddObservation(localVelocity.x / MAX_VELOCITY);  // right/left
+            sensor.AddObservation(agentRb.angularVelocity.y / 360f); // rotation
+            observationCount += 3;
 
-            // Ball observations (6 values)
-            if (m_Ball != null)
-            {
-                var ballRb = m_Ball.GetComponent<Rigidbody>();
-                sensor.AddObservation(m_Ball.transform.position); // 3 values
-                sensor.AddObservation(ballRb.velocity); // 3 values
-            }
-            else
-            {
-                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
-                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
-            }
-            observationCount += 6;
-
-            // Goal positions (6 values)
+            // Goals relative positions (4 values: 2 per goal)
             if (m_OwnGoal != null && m_OpponentGoal != null)
             {
-                sensor.AddObservation(m_OwnGoal.transform.position); // 3 values
-                sensor.AddObservation(m_OpponentGoal.transform.position); // 3 values
+                // Own goal angle and distance
+                Vector3 toOwnGoal = m_OwnGoal.transform.position - transform.position;
+                float ownGoalDistance = toOwnGoal.magnitude / rayLength;
+                float ownGoalAngle = Vector3.SignedAngle(transform.forward, toOwnGoal, Vector3.up) / 180f;
+                sensor.AddObservation(ownGoalDistance);
+                sensor.AddObservation(ownGoalAngle);
+
+                // Opponent goal angle and distance
+                Vector3 toOppGoal = m_OpponentGoal.transform.position - transform.position;
+                float oppGoalDistance = toOppGoal.magnitude / rayLength;
+                float oppGoalAngle = Vector3.SignedAngle(transform.forward, toOppGoal, Vector3.up) / 180f;
+                sensor.AddObservation(oppGoalDistance);
+                sensor.AddObservation(oppGoalAngle);
             }
             else
             {
-                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
-                sensor.AddObservation(new Vector3(0, 0, 0)); // 3 values
+                sensor.AddObservation(1.0f);  // max distance
+                sensor.AddObservation(0.0f);  // zero angle
+                sensor.AddObservation(1.0f);  // max distance
+                sensor.AddObservation(0.0f);  // zero angle
             }
-            observationCount += 6;
+            observationCount += 4;
 
             // Team and role information (2 values)
             sensor.AddObservation((int)team);
             sensor.AddObservation((int)position);
             observationCount += 2;
 
-            // Add ray observations for this frame
+            // Ball data (4 values: position + velocity when seen by rays)
+            bool ballSeen = false;
+            if (memoryFrame?.RayOutputs != null)
+            {
+                // Check if any ray sees the ball
+                foreach (var ray in memoryFrame.RayOutputs)
+                {
+                    if (ray.HasHit && ray.HitTagIndex == 0) // Assuming ball is first tag
+                    {
+                        ballSeen = true;
+                        break;
+                    }
+                }
+            }
+
+            if (ballSeen && m_Ball != null)
+            {
+                var ballRb = m_Ball.GetComponent<Rigidbody>();
+                if (ballRb != null)
+                {
+                    // Ball position relative to agent (angle and distance)
+                    Vector3 toBall = m_Ball.transform.position - transform.position;
+                    float ballDistance = toBall.magnitude / rayLength;
+                    float ballAngle = Vector3.SignedAngle(transform.forward, toBall, Vector3.up) / 180f;
+                    sensor.AddObservation(ballDistance);
+                    sensor.AddObservation(ballAngle);
+
+                    // Ball velocity relative to agent (forward/back and right/left)
+                    Vector3 relativeBallVel = transform.InverseTransformDirection(
+                        ballRb.velocity - agentRb.velocity
+                    );
+                    sensor.AddObservation(relativeBallVel.z / MAX_VELOCITY);  // forward/back
+                    sensor.AddObservation(relativeBallVel.x / MAX_VELOCITY);  // right/left
+                }
+                else
+                {
+                    // Ball exists but no rigidbody
+                    sensor.AddObservation(-1.0f); // negative distance to indicate not seen
+                    sensor.AddObservation(0.0f);  // zero angle
+                    sensor.AddObservation(Vector2.zero); // no velocity
+                }
+            }
+            else
+            {
+                // Ball not seen
+                sensor.AddObservation(-1.0f); // negative distance to indicate not seen
+                sensor.AddObservation(0.0f);  // zero angle
+                sensor.AddObservation(Vector2.zero); // no velocity
+            }
+            observationCount += 4;
+
+            // Ray observations
             if (memoryFrame?.RayOutputs != null)
             {
                 foreach (var ray in memoryFrame.RayOutputs)
                 {
-                    sensor.AddObservation(ray.HitFraction);
-                    sensor.AddObservation(ray.HasHit ? 1 : 0);
-                    sensor.AddObservation(ray.HitTagIndex);
+                    sensor.AddObservation(ray.HitFraction);    // Distance
+                    sensor.AddObservation(ray.HasHit ? 1 : 0); // Hit flag
+                    sensor.AddObservation(ray.HitTagIndex / (float)raySensor.DetectableTags.Count); // Tag
+                    observationCount += 3;
+                }
+            }
+            else
+            {
+                int totalRays = raySensor.RaysPerDirection * 2 + 1;
+                for (int i = 0; i < totalRays; i++)
+                {
+                    sensor.AddObservation(1.0f); // Max distance (normalized)
+                    sensor.AddObservation(0);    // No hit
+                    sensor.AddObservation(0);    // No tag
                     observationCount += 3;
                 }
             }
         }
-
-        Debug.Log($"Total observations sent: {observationCount}");
     }
 
 }
