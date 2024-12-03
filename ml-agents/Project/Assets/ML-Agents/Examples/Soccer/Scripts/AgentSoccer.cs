@@ -20,29 +20,30 @@ public class AgentSoccer : Agent
 
     [HideInInspector]
     public Team team;
-    float m_KickPower;
-    float m_BallTouch;
+    private float m_KickPower;
+    private float m_BallTouch;
     public Position position;
 
-    const float k_Power = 2000f;
-    float m_Existential;
-    float m_LateralSpeed;
-    float m_ForwardSpeed;
+    private const float k_Power = 2000f;
+    private float m_Existential;
+    private float m_LateralSpeed;
+    private float m_ForwardSpeed;
 
     [HideInInspector]
     public Rigidbody agentRb;
-    SoccerSettings m_SoccerSettings;
-    BehaviorParameters m_BehaviorParameters;
+    private SoccerSettings m_SoccerSettings;
+    private BehaviorParameters m_BehaviorParameters;
+    private SoccerEnvController envController;
     public Vector3 initialPos;
     public float rotSign;
 
-    EnvironmentParameters m_ResetParams;
+    private EnvironmentParameters m_ResetParams;
 
-    public float visionAngle; // Added vision angle
+    public float visionAngle; // Vision angle for directional awareness
 
     public override void Initialize()
     {
-        SoccerEnvController envController = GetComponentInParent<SoccerEnvController>();
+        envController = GetComponentInParent<SoccerEnvController>();
         if (envController != null)
         {
             m_Existential = 1f / envController.MaxEnvironmentSteps;
@@ -52,7 +53,7 @@ public class AgentSoccer : Agent
             m_Existential = 1f / MaxStep;
         }
 
-        m_BehaviorParameters = gameObject.GetComponent<BehaviorParameters>();
+        m_BehaviorParameters = GetComponent<BehaviorParameters>();
         if (m_BehaviorParameters.TeamId == (int)Team.Blue)
         {
             team = Team.Blue;
@@ -65,21 +66,24 @@ public class AgentSoccer : Agent
             initialPos = new Vector3(transform.position.x + 5f, .5f, transform.position.z);
             rotSign = -1f;
         }
-        if (position == Position.Goalie)
+
+        // Set speeds based on position
+        switch (position)
         {
-            m_LateralSpeed = 1.0f;
-            m_ForwardSpeed = 1.0f;
+            case Position.Goalie:
+                m_LateralSpeed = 1.0f;
+                m_ForwardSpeed = 1.0f;
+                break;
+            case Position.Striker:
+                m_LateralSpeed = 0.3f;
+                m_ForwardSpeed = 1.3f;
+                break;
+            default:
+                m_LateralSpeed = 0.3f;
+                m_ForwardSpeed = 1.0f;
+                break;
         }
-        else if (position == Position.Striker)
-        {
-            m_LateralSpeed = 0.3f;
-            m_ForwardSpeed = 1.3f;
-        }
-        else
-        {
-            m_LateralSpeed = 0.3f;
-            m_ForwardSpeed = 1.0f;
-        }
+
         m_SoccerSettings = FindObjectOfType<SoccerSettings>();
         agentRb = GetComponent<Rigidbody>();
         agentRb.maxAngularVelocity = 500;
@@ -89,144 +93,178 @@ public class AgentSoccer : Agent
         visionAngle = 0f; // Initialize vision angle
     }
 
-public void MoveAgent(ActionSegment<int> act)
-{
-    var dirToGo = Vector3.zero;
-    var rotateDir = Vector3.zero;
-
-    m_KickPower = 0f;
-
-    var forwardAxis = act[0];
-    var rightAxis = act[1];
-    var rotateAxis = act[2];
-    var visionAxis = act.Length > 3 ? act[3] : 0; // Safeguard against index out of range
-
-    switch (forwardAxis)
+    public void MoveAgent(ActionSegment<int> act)
     {
-        case 1:
-            dirToGo = transform.forward * m_ForwardSpeed;
-            m_KickPower = 1f;
-            break;
-        case 2:
-            dirToGo = transform.forward * -m_ForwardSpeed;
-            break;
-    }
+        var dirToGo = Vector3.zero;
+        var rotateDir = Vector3.zero;
 
-    switch (rightAxis)
-    {
-        case 1:
-            dirToGo = transform.right * m_LateralSpeed;
-            break;
-        case 2:
-            dirToGo = transform.right * -m_LateralSpeed;
-            break;
-    }
+        m_KickPower = 0f;
 
-    switch (rotateAxis)
-    {
-        case 1:
-            rotateDir = transform.up * -1f;
-            break;
-        case 2:
-            rotateDir = transform.up * 1f;
-            break;
-    }
+        var forwardAxis = act[0];
+        var rightAxis = act[1];
+        var rotateAxis = act[2];
+        var visionAxis = act.Length > 3 ? act[3] : 0; // Check for vision axis availability
 
-    // Adjust vision angle only if available
-    if (act.Length > 3)
-    {
-        switch (visionAxis)
+        // Forward/backward movement
+        switch (forwardAxis)
         {
             case 1:
-                visionAngle -= 360f; // Look left
+                dirToGo = transform.forward * m_ForwardSpeed;
                 break;
             case 2:
-                visionAngle += 360f; // Look right
+                dirToGo = transform.forward * -m_ForwardSpeed;
                 break;
         }
+
+        // Lateral movement
+        switch (rightAxis)
+        {
+            case 1:
+                dirToGo = transform.right * m_LateralSpeed;
+                break;
+            case 2:
+                dirToGo = transform.right * -m_LateralSpeed;
+                break;
+        }
+
+        // Rotation
+        switch (rotateAxis)
+        {
+            case 1:
+                rotateDir = transform.up * -1f;
+                break;
+            case 2:
+                rotateDir = transform.up * 1f;
+                break;
+        }
+
+        // Adjust vision angle for awareness
+        if (visionAxis > 0)
+        {
+            switch (visionAxis)
+            {
+                case 1:
+                    visionAngle -= 180f; // Look left
+                    break;
+                case 2:
+                    visionAngle += 180f; // Look right
+                    break;
+            }
+        }
+
+        visionAngle = Mathf.Repeat(visionAngle, 180f); // Clamp vision angle to [0, 360]
+
+        // Apply movement and rotation
+        transform.Rotate(rotateDir, Time.deltaTime * 180f);
+        agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
     }
-
-    // Clamp vision angle to 360 degrees
-    visionAngle = Mathf.Repeat(visionAngle, 360f);
-
-    transform.Rotate(rotateDir, Time.deltaTime * 150f);
-    agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
-        ForceMode.VelocityChange);
-}
-
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
+        // Existential reward: encourage agents to persist in the environment
+        AddReward(m_Existential);
+
+        Vector3 ballPosition = envController.getBallPosition();
+
+        // Positional rewards (specific to roles)
         if (position == Position.Goalie)
         {
-            AddReward(m_Existential);
+            // Add specific goalie rewards, if necessary
         }
         else if (position == Position.Striker)
         {
-            AddReward(-m_Existential);
+            // Add specific striker rewards, if necessary
         }
+
+        // Move the agent based on actions
         MoveAgent(actionBuffers.DiscreteActions);
+
+        // Penalize inactivity near the wall
+        PenalizeInactivityNearWall();
+    }
+
+    private void PenalizeInactivityNearWall()
+    {
+        float wallDistance = Mathf.Min(Mathf.Abs(transform.position.x), Mathf.Abs(transform.position.z));
+
+        // Penalize if the agent is too close to the wall and not moving
+        if (wallDistance < 1.0f && agentRb.velocity.magnitude < 0.5f)
+        {
+            AddReward(-0.1f);  // Adjust the penalty as needed
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
-        //forward
-        if (Input.GetKey(KeyCode.W))
+
+        // Forward/backward
+        if (Input.GetKey(KeyCode.W)) discreteActionsOut[0] = 1;
+        if (Input.GetKey(KeyCode.S)) discreteActionsOut[0] = 2;
+
+        // Right/left
+        if (Input.GetKey(KeyCode.D)) discreteActionsOut[1] = 1;
+        if (Input.GetKey(KeyCode.A)) discreteActionsOut[1] = 2;
+
+        // Rotation
+        if (Input.GetKey(KeyCode.E)) discreteActionsOut[2] = 1;
+        if (Input.GetKey(KeyCode.Q)) discreteActionsOut[2] = 2;
+
+        // Vision adjustment
+        if (Input.GetKey(KeyCode.LeftArrow)) discreteActionsOut[3] = 1;
+        if (Input.GetKey(KeyCode.RightArrow)) discreteActionsOut[3] = 2;
+    }
+
+    private void EvaluateKickDirection(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("ball"))
         {
-            discreteActionsOut[0] = 1;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            discreteActionsOut[0] = 2;
-        }
-        //rotate
-        if (Input.GetKey(KeyCode.A))
-        {
-            discreteActionsOut[2] = 1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            discreteActionsOut[2] = 2;
-        }
-        //right
-        if (Input.GetKey(KeyCode.E))
-        {
-            discreteActionsOut[1] = 1;
-        }
-        if (Input.GetKey(KeyCode.Q))
-        {
-            discreteActionsOut[1] = 2;
-        }
-        //vision
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            discreteActionsOut[3] = 1;
-        }
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            discreteActionsOut[3] = 2;
+            // Get the ball's Rigidbody to analyze its velocity
+            Rigidbody ballRb = collision.gameObject.GetComponent<Rigidbody>();
+            Vector3 ballVelocity = ballRb.velocity;
+
+            // Determine if the ball is moving towards the agent's own side
+            bool isMovingTowardsOwnSide = (team == Team.Blue && ballVelocity.x < 0) ||
+                                          (team == Team.Purple && ballVelocity.x > 0);
+
+            // Determine if the ball is moving towards the opponent's side
+            bool isMovingTowardsOpponentSide = (team == Team.Blue && ballVelocity.x > 0) ||
+                                               (team == Team.Purple && ballVelocity.x < 0);
+
+            // Penalize for kicking towards own side
+            if (isMovingTowardsOwnSide)
+            {
+                AddReward(-0.2f); // Penalize the agent
+            }
+
+            // Reward for kicking towards the opponent's side
+            if (isMovingTowardsOpponentSide)
+            {
+                AddReward(0.3f); // Reward the agent
+            }
         }
     }
 
-    void OnCollisionEnter(Collision c)
+    private void OnCollisionEnter(Collision collision)
     {
         var force = k_Power * m_KickPower;
-        if (position == Position.Goalie)
+        if (collision.gameObject.CompareTag("ball"))
         {
-            force = k_Power;
-        }
-        if (c.gameObject.CompareTag("ball"))
-        {
-            AddReward(.2f * m_BallTouch);
-            var dir = c.contacts[0].point - transform.position;
+            AddReward(0.2f); // Reward for ball contact
+            m_BallTouch += 0.1f; // Increment ball touch metric
+
+            var dir = collision.contacts[0].point - transform.position;
             dir = dir.normalized;
-            c.gameObject.GetComponent<Rigidbody>().AddForce(dir * force);
+
+            collision.gameObject.GetComponent<Rigidbody>().AddForce(dir * force);
+
+            // Evaluate the direction of the kick
+            EvaluateKickDirection(collision);
         }
     }
 
     public override void OnEpisodeBegin()
     {
-        m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
+        m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0.1f); // Initialize ball touch reward scaling
     }
 }
