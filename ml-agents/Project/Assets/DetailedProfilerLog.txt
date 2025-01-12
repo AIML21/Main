@@ -1,0 +1,441 @@
+[1/10/2025 1:05:47 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 465 MB
+
+<b>Memory</b>
+- Total Used Memory: 2406 MB
+- Allocated Memory: 472 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:47 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 465 MB
+
+<b>Memory</b>
+- Total Used Memory: 2406 MB
+- Allocated Memory: 636 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:48 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 466 MB
+
+<b>Memory</b>
+- Total Used Memory: 2406 MB
+- Allocated Memory: 804 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:48 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 467 MB
+
+<b>Memory</b>
+- Total Used Memory: 2406 MB
+- Allocated Memory: 962 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:49 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 468 MB
+
+<b>Memory</b>
+- Total Used Memory: 2143 MB
+- Allocated Memory: 961 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:49 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 470 MB
+
+<b>Memory</b>
+- Total Used Memory: 2112 MB
+- Allocated Memory: 994 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:50 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 472 MB
+
+<b>Memory</b>
+- Total Used Memory: 2096 MB
+- Allocated Memory: 1055 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:50 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 474 MB
+
+<b>Memory</b>
+- Total Used Memory: 2074 MB
+- Allocated Memory: 1111 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:51 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 477 MB
+
+<b>Memory</b>
+- Total Used Memory: 2052 MB
+- Allocated Memory: 1171 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:51 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 480 MB
+
+<b>Memory</b>
+- Total Used Memory: 2029 MB
+- Allocated Memory: 1206 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:52 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 483 MB
+
+<b>Memory</b>
+- Total Used Memory: 1999 MB
+- Allocated Memory: 1293 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:52 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 487 MB
+
+<b>Memory</b>
+- Total Used Memory: 1987 MB
+- Allocated Memory: 1344 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:53 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 490 MB
+
+<b>Memory</b>
+- Total Used Memory: 1986 MB
+- Allocated Memory: 1369 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:53 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 494 MB
+
+<b>Memory</b>
+- Total Used Memory: 1986 MB
+- Allocated Memory: 1397 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:54 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 499 MB
+
+<b>Memory</b>
+- Total Used Memory: 2002 MB
+- Allocated Memory: 1485 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:54 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 504 MB
+
+<b>Memory</b>
+- Total Used Memory: 2089 MB
+- Allocated Memory: 1519 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:55 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 509 MB
+
+<b>Memory</b>
+- Total Used Memory: 2130 MB
+- Allocated Memory: 1613 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:55 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 515 MB
+
+<b>Memory</b>
+- Total Used Memory: 2225 MB
+- Allocated Memory: 1641 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:56 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 520 MB
+
+<b>Memory</b>
+- Total Used Memory: 2298 MB
+- Allocated Memory: 1783 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:56 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 526 MB
+
+<b>Memory</b>
+- Total Used Memory: 2439 MB
+- Allocated Memory: 1924 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+
+[1/10/2025 1:05:57 PM] <b>CPU Usage</b>
+- Rendering: Not available in build
+- Scripts: N/A
+- Garbage Collector: 533 MB
+
+<b>Memory</b>
+- Total Used Memory: 2562 MB
+- Allocated Memory: 2000 MB
+- Graphics Memory: 3965 MB
+- System Memory: 16047 MB
+
+<b>Audio</b>
+- Playing Audio Sources: 0
+
+<b>System Info</b>
+- Operating System: Windows 11  (10.0.26100) 64bit
+- Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+- Graphics Device: NVIDIA RTX A2000 Laptop GPU
+- Screen Resolution: 1920x1080@59.9338780031849Hz
+- Unity Version: 2022.3.4f1
+

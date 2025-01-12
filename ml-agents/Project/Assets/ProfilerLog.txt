@@ -1,0 +1,270 @@
+[1/10/2025 12:54:37 PM] FPS: 251.3
+CPU Reserved Memory: 1910 MB
+CPU Allocated Memory: 464 MB
+CPU Mono Memory: 465 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:38 PM] FPS: 342.2
+CPU Reserved Memory: 1910 MB
+CPU Allocated Memory: 611 MB
+CPU Mono Memory: 466 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:38 PM] FPS: 189.6
+CPU Reserved Memory: 1910 MB
+CPU Allocated Memory: 766 MB
+CPU Mono Memory: 466 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:39 PM] FPS: 218.4
+CPU Reserved Memory: 1910 MB
+CPU Allocated Memory: 923 MB
+CPU Mono Memory: 467 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:39 PM] FPS: 169.8
+CPU Reserved Memory: 1910 MB
+CPU Allocated Memory: 1085 MB
+CPU Mono Memory: 468 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:40 PM] FPS: 357.6
+CPU Reserved Memory: 1867 MB
+CPU Allocated Memory: 1087 MB
+CPU Mono Memory: 470 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:40 PM] FPS: 312.3
+CPU Reserved Memory: 1848 MB
+CPU Allocated Memory: 1134 MB
+CPU Mono Memory: 472 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:41 PM] FPS: 442.3
+CPU Reserved Memory: 1828 MB
+CPU Allocated Memory: 1186 MB
+CPU Mono Memory: 474 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:41 PM] FPS: 294.2
+CPU Reserved Memory: 1827 MB
+CPU Allocated Memory: 1219 MB
+CPU Mono Memory: 476 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:42 PM] FPS: 382.5
+CPU Reserved Memory: 1824 MB
+CPU Allocated Memory: 1232 MB
+CPU Mono Memory: 479 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:43 PM] FPS: 306.8
+CPU Reserved Memory: 1824 MB
+CPU Allocated Memory: 1312 MB
+CPU Mono Memory: 482 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:43 PM] FPS: 23.3
+CPU Reserved Memory: 1885 MB
+CPU Allocated Memory: 1342 MB
+CPU Mono Memory: 485 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:44 PM] FPS: 19.5
+CPU Reserved Memory: 1930 MB
+CPU Allocated Memory: 1403 MB
+CPU Mono Memory: 488 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:44 PM] FPS: 18.2
+CPU Reserved Memory: 2001 MB
+CPU Allocated Memory: 1491 MB
+CPU Mono Memory: 492 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:45 PM] FPS: 103.9
+CPU Reserved Memory: 2086 MB
+CPU Allocated Memory: 1524 MB
+CPU Mono Memory: 496 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:45 PM] FPS: 107.3
+CPU Reserved Memory: 2125 MB
+CPU Allocated Memory: 1616 MB
+CPU Mono Memory: 500 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:46 PM] FPS: 248.8
+CPU Reserved Memory: 2219 MB
+CPU Allocated Memory: 1673 MB
+CPU Mono Memory: 504 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+
+[1/10/2025 12:54:46 PM] FPS: 76.3
+CPU Reserved Memory: 2274 MB
+CPU Allocated Memory: 1723 MB
+CPU Mono Memory: 509 MB
+GPU Memory (Total): 3965 MB
+System Memory (Total): 16047 MB
+Draw Calls: N/A (Built-in)
+Render Pipeline: Built-in
+Operating System: Windows 11  (10.0.26100) 64bit
+Processor: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (16 cores)
+Graphics Device: NVIDIA RTX A2000 Laptop GPU
+Graphics API: Direct3D11
+Screen Resolution: 1920x1080@60Hz
+Unity Version: 2022.3.4f1
+

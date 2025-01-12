@@ -157,33 +157,19 @@ public void MoveAgent(ActionSegment<int> act)
         switch (visionAxis)
         {
             case 1:
-<<<<<<< Updated upstream
                 visionAngle -= 180f; // Look left
                 break;
             case 2:
                 visionAngle += 180f; // Look right
-=======
-                visionAngle -= 360f;
-                break;
-            case 2:
-                visionAngle += 360f;
->>>>>>> Stashed changes
                 break;
         }
     }
 
     visionAngle = Mathf.Repeat(visionAngle, 360f);
 
-<<<<<<< Updated upstream
     transform.Rotate(rotateDir, Time.deltaTime * 100f);
     agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
         ForceMode.VelocityChange);
-=======
-    transform.Rotate(rotateDir, Time.deltaTime * 150f);
-    agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
-
-    JumpIfNeeded(); // Call the jump logic here
->>>>>>> Stashed changes
 }
 
 
