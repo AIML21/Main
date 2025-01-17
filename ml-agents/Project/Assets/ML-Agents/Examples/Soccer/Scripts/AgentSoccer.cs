@@ -24,15 +24,10 @@ public class AgentSoccer : Agent
     private float m_BallTouch;
     public Position position;
 
-    public float jumpForce = 10f; // Adjust as needed for a realistic jump
-    public float jumpInterval = 2f; // Interval in seconds
-    private float lastJumpTime; // Tracks the last jump time
-
-
-    const float k_Power = 2000f;
-    float m_Existential;
-    float m_LateralSpeed;
-    float m_ForwardSpeed;
+    private const float k_Power = 2000f;
+    private float m_Existential;
+    private float m_LateralSpeed;
+    private float m_ForwardSpeed;
 
     [HideInInspector]
     public Rigidbody agentRb;
@@ -98,34 +93,7 @@ public class AgentSoccer : Agent
         visionAngle = 0f; // Initialize vision angle
     }
 
-private bool IsGrounded()
-{
-    return Physics.Raycast(transform.position, Vector3.down, 1.1f);
-}
-
-void JumpIfNeeded()
-{
-    if (Time.time - lastJumpTime >= jumpInterval && IsGrounded())
-    {
-        agentRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        lastJumpTime = Time.time; // Update the last jump time
-    }
-}
-
-
-public void MoveAgent(ActionSegment<int> act)
-{
-    var dirToGo = Vector3.zero;
-    var rotateDir = Vector3.zero;
-
-    m_KickPower = 0f;
-
-    var forwardAxis = act[0];
-    var rightAxis = act[1];
-    var rotateAxis = act[2];
-    var visionAxis = act.Length > 3 ? act[3] : 0;
-
-    switch (forwardAxis)
+    public void MoveAgent(ActionSegment<int> act)
     {
         var dirToGo = Vector3.zero;
         var rotateDir = Vector3.zero;
@@ -137,9 +105,8 @@ public void MoveAgent(ActionSegment<int> act)
         var rotateAxis = act[2];
         var visionAxis = act.Length > 3 ? act[3] : 0; // Check for vision axis availability
 
-    if (act.Length > 3)
-    {
-        switch (visionAxis)
+        // Forward/backward movement
+        switch (forwardAxis)
         {
             case 1:
                 dirToGo = transform.forward * m_ForwardSpeed;
@@ -177,29 +144,20 @@ public void MoveAgent(ActionSegment<int> act)
             switch (visionAxis)
             {
                 case 1:
-                    visionAngle -= 180f; // Look left
+                    visionAngle -= 20f; // Look left
                     break;
                 case 2:
-                    visionAngle += 180f; // Look right
+                    visionAngle += 20f; // Look right
                     break;
             }
         }
 
-        visionAngle = Mathf.Repeat(visionAngle, 180f); // Clamp vision angle to [0, 360]
+        visionAngle = Mathf.Repeat(visionAngle, 360f); // Clamp vision angle to [0, 360]
 
         // Apply movement and rotation
-        transform.Rotate(rotateDir, Time.deltaTime * 180f);
+        transform.Rotate(rotateDir, Time.deltaTime * 150f);
         agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
     }
-
-    visionAngle = Mathf.Repeat(visionAngle, 360f);
-
-    transform.Rotate(rotateDir, Time.deltaTime * 100f);
-    agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
-        ForceMode.VelocityChange);
-}
-
-
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
@@ -223,7 +181,22 @@ public void MoveAgent(ActionSegment<int> act)
 
         // Penalize inactivity near the wall
         PenalizeInactivityNearWall();
+
+        // Reward movement away from the wall
+        //RewardMovementAwayFromWall();
     }
+
+    // private void RewardMovementAwayFromWall()
+    // {
+    //     float wallDistanceX = Mathf.Abs(transform.position.x);
+    //     float wallDistanceZ = Mathf.Abs(transform.position.z);
+
+    //     // If the agent is near the wall, reward them for moving further away
+    //     if (wallDistanceX > 4.5f || wallDistanceZ > 4.5f)
+    //     {
+    //         AddReward(0.05f); // Reward magnitude can be adjusted based on impact
+    //     }
+    // }
 
     private void PenalizeInactivityNearWall()
     {
