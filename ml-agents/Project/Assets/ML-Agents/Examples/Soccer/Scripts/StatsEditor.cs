@@ -13,7 +13,6 @@ public class DetailedStatsDisplay : MonoBehaviour
     private float elapsedTime = 0f;
     private const float Padding = 20f; // Extra padding at the bottom of the content
     private float fps; // Stores the calculated frame rate
-    private const float targetFrameTimeMs = 16.67f; // Target frame time for 60 FPS
 
     // ProfilerRecorder objects for CPU and GPU metrics
     private ProfilerRecorder mainThreadTimeRecorder;
@@ -44,7 +43,7 @@ public class DetailedStatsDisplay : MonoBehaviour
         elapsedTime += Time.deltaTime;
 
         // Calculate FPS (Frame Per Second)
-        fps = 1f / Time.deltaTime;
+        fps = Mathf.Clamp(1f / Time.deltaTime, 0, Application.targetFrameRate > 0 ? Application.targetFrameRate : 60);
 
         if (elapsedTime >= updateInterval)
         {
@@ -57,17 +56,16 @@ public class DetailedStatsDisplay : MonoBehaviour
 
     void UpdateStats()
     {
-        // Retrieve data from ProfilerRecorder
-        float mainThreadTimeMs = mainThreadTimeRecorder.LastValue / 1_000_000f; // Convert from nanoseconds to milliseconds
-        float renderThreadTimeMs = renderThreadTimeRecorder.LastValue / 1_000_000f; // Convert from nanoseconds to milliseconds
+        // Manually calculate average time for CPU and GPU usage
+        float mainThreadTimeMs = CalculateAverage(mainThreadTimeRecorder) / 1_000_000f; // Convert from nanoseconds to milliseconds
+        float renderThreadTimeMs = CalculateAverage(renderThreadTimeRecorder) / 1_000_000f; // Convert from nanoseconds to milliseconds
+
+        // Dynamically calculate the target frame time
+        float targetFrameTimeMs = 1000f / (Application.targetFrameRate > 0 ? Application.targetFrameRate : 60);
 
         // Estimate CPU and GPU usage based on frame time
-        float estimatedCpuUsage = (mainThreadTimeMs / targetFrameTimeMs) * 100f;
-        float estimatedGpuUsage = (renderThreadTimeMs / targetFrameTimeMs) * 100f;
-
-        // Ensure values are within 0-100% range
-        estimatedCpuUsage = Mathf.Clamp(estimatedCpuUsage, 0, 100);
-        estimatedGpuUsage = Mathf.Clamp(estimatedGpuUsage, 0, 100);
+        float estimatedCpuUsage = Mathf.Clamp((mainThreadTimeMs / targetFrameTimeMs) * 100f, 0, 100);
+        float estimatedGpuUsage = Mathf.Clamp((renderThreadTimeMs / targetFrameTimeMs) * 100f, 0, 100);
 
         // Top Section: Performance Metrics
         string performanceMetrics = $"<b>Performance Metrics</b>\n" +
@@ -111,6 +109,18 @@ public class DetailedStatsDisplay : MonoBehaviour
         // Adjust the content size to ensure scrolling works correctly
         UpdateContentSize();
     }
+
+    float CalculateAverage(ProfilerRecorder recorder)
+    {
+        long sum = 0;
+        int count = recorder.Count;
+        for (int i = 0; i < count; i++)
+        {
+            sum += recorder.GetSample(i).Value; // Access the numeric value of the sample
+        }
+        return count > 0 ? (float)sum / count : 0f;
+    }
+
 
     void UpdateContentSize()
     {
